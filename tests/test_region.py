@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring,unused-argument,invalid-name
 from __future__ import print_function
 
-from ctypes import c_int
 from unittest import TestCase
 
 from mock import patch
@@ -32,6 +31,23 @@ class ConstructorUnitTests(RegionTestCase):
         )
         self.assertEquals(region.top_left.x, region.bottom_right.x)
         self.assertEquals(region.top_left.y, region.bottom_right.y)
+
+
+class ContainsUnitTests(RegionTestCase):
+
+    def test_contains(self):
+        region = Region(
+            self.DEFAULT_TOP_LEFT,
+            self.DEFAULT_WIDTH,
+            self.DEFAULT_HEIGHT
+        )
+        for x in [-1, 0, 1]:
+            for y in [-1, 0, 1]:
+                print(x, y)
+                self.assertEquals(
+                    region.contains(Point(x, y)),
+                    x > -1 and y > -1
+                )
 
 
 class StrUnitTests(RegionTestCase):
