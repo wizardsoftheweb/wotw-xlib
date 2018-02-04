@@ -1,0 +1,6 @@
+include wotw_xlib/*.py
+include wotw_xlib/VERSION
+include LICENSE
+include README.md
+include tox.ini
+include setup.cfg
