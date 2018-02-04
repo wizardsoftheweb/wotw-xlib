@@ -5,6 +5,7 @@
 # Personal stuff
 .wotw-ignored
 scratch.*
+.pytest_cache
 
 # Everything below pulled directly from
 # https://github.com/github/gitignore/blob/master/Python.gitignore
