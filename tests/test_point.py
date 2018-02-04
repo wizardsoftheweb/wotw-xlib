@@ -64,3 +64,13 @@ class IsAboveAndLeftOfUnitTests(PointTestCase):
                     origin.is_above_and_left_of(Point(x, y)),
                     x > -1 and y > -1
                 )
+
+
+class StrUnitTests(PointTestCase):
+
+    def test_to_string(self):
+        sample = Point(self.DEFAULT_COORDINATE, self.DEFAULT_COORDINATE)
+        self.assertEquals(
+            sample.__str__(),
+            "(%d,%d)" % (self.DEFAULT_COORDINATE, self.DEFAULT_COORDINATE)
+        )
