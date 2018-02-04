@@ -51,3 +51,16 @@ class ParseCoordinatesUnitTests(PointTestCase):
         self.assertNotEquals(ctype_coord, self.DEFAULT_COORDINATE)
         output = Point.parse_coordinate(ctype_coord)
         self.assertEquals(self.DEFAULT_COORDINATE, output)
+
+
+class IsAboveAndLeftOfUnitTests(PointTestCase):
+
+    def test_cardinal_directions(self):
+        origin = Point(0, 0)
+        for x in [-1, 0, 1]:
+            for y in [-1, 0, 1]:
+                print(x, y)
+                self.assertEquals(
+                    origin.is_above_and_left_of(Point(x, y)),
+                    x > -1 and y > -1
+                )
