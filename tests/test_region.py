@@ -18,6 +18,22 @@ class RegionTestCase(TestCase):
     DEFAULT_BOTTOM_RIGHT = Point(2, 2)
 
 
+class ConstructorUnitTests(RegionTestCase):
+
+    @patch(
+        'wotw_xlib.Point.parse_coordinate',
+        return_value=0
+    )
+    def test_assignment(self, mock_parse):
+        region = Region(
+            self.DEFAULT_TOP_LEFT,
+            self.DEFAULT_WIDTH,
+            self.DEFAULT_HEIGHT
+        )
+        self.assertEquals(region.top_left.x, region.bottom_right.x)
+        self.assertEquals(region.top_left.y, region.bottom_right.y)
+
+
 class StrUnitTests(RegionTestCase):
 
     def test_to_string(self):
