@@ -135,3 +135,15 @@ class EnterUnitTests(NeedsDisplayTestCase):
     def test_self_is_returned(self):
         result = self.has_display.__enter__()
         self.assertEquals(self.has_display, result)
+
+
+class ExitUnitTests(NeedsDisplayTestCase):
+
+    @patch(
+        'wotw_xlib.common.NeedsDisplay.close_display',
+        return_value=NeedsDisplayTestCase.PARSED_DISPLAY
+    )
+    def test_close_is_called(self, mock_close):
+        self.has_display.display = self.PARSED_DISPLAY
+        self.has_display.__exit__(1, 2, 3)
+        mock_close.assert_called_once_with(self.PARSED_DISPLAY)
