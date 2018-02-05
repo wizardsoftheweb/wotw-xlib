@@ -85,3 +85,24 @@ class ParseUnknownDisplayUnitTests(NeedsDisplayTestCase):
             mock_open.assert_called_once_with(None)
             self.assertEquals(result, self.PARSED_DISPLAY)
             mock_open.reset_mock()
+
+
+class OpenDisplayUnitTests(NeedsDisplayTestCase):
+
+    DISPLAY_TO_OPEN = ':47.0'
+
+    @patch(
+        'wotw_xlib.needs_display.XOpenDisplay',
+        return_value=NeedsDisplayTestCase.PARSED_DISPLAY
+    )
+    def test_flag_is_set(self, mock_open):
+        self.has_display.open_display(self.DISPLAY_TO_OPEN)
+        self.assertTrue(self.has_display.opened_display)
+
+    @patch(
+        'wotw_xlib.needs_display.XOpenDisplay',
+        return_value=NeedsDisplayTestCase.PARSED_DISPLAY
+    )
+    def test_parse_is_called(self, mock_open):
+        self.has_display.open_display(self.DISPLAY_TO_OPEN)
+        mock_open.assert_called_once_with(self.DISPLAY_TO_OPEN)
