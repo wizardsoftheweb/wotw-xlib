@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+from wotw_xlib.xlib import Window
+from wotw_xlib.common import NeedsDisplay, PointerWindow
+
+
+def get_window_under_pointer(display, root_window):
+    pointers, total_count = root_window.get_query_tree()
+    if total_count > 0:
+        discovered_window = root_window
+        pointer_location = root_window.get_mouse_position()[1]
+        for index in range(0, total_count):
+            window = PointerWindow(display, Window(pointers[index]))
+            if window.might_be_under_pointer(pointer_location):
+                discovered_window = window
+        if discovered_window.window != root_window.window:
+            return get_window_under_pointer(display, discovered_window)
+    return root_window
+
+with NeedsDisplay() as main_display:
+    BASE_WINDOW = PointerWindow(main_display.display)
+    RESULT = get_window_under_pointer(main_display.display, BASE_WINDOW)
+    print(RESULT.get_names())
