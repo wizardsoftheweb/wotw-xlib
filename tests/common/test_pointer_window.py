@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from mock import call, MagicMock, patch
 
-
+from wotw_xlib.utils import Point
 from wotw_xlib.common import PointerWindow
 # pylint:disable=unused-import
 from wotw_xlib.xlib import (
@@ -56,6 +56,7 @@ class PointerWindowTestCase(TestCase):
             self.DEFAULT_DISPLAY,
             self.DEFAULT_WINDOW_ID
         )
+        self.pointer_window.display = self.DEFAULT_DISPLAY
         parse_window_id_patcher.stop()
         get_region_patcher.stop()
         super_patcher.stop()
@@ -122,3 +123,26 @@ class DiscoverRootWindowUnitTests(PointerWindowTestCase):
             call.XDefaultScreen(self.DEFAULT_DISPLAY),
             call.XRootWindow(self.DEFAULT_DISPLAY, self.DEFAULT_SCREEN)
         ])
+
+
+class GetMousePositionUnitTests(PointerWindowTestCase):
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XQueryPointer',
+        return_value=MagicMock()
+    )
+    def test_function_call(self, mock_query):
+        self.pointer_window.get_mouse_position()
+        mock_query.assert_called_once()
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XQueryPointer',
+        return_value=MagicMock()
+    )
+    def test_return_points(self, mock_query):
+        empty = Point(0, 0)
+        root, win = self.pointer_window.get_mouse_position()
+        self.assertEquals(empty.x, root.x)
+        self.assertEquals(empty.y, root.y)
+        self.assertEquals(empty.x, win.x)
+        self.assertEquals(empty.y, win.y)
