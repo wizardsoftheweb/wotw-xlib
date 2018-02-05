@@ -1,7 +1,7 @@
 # pylint: disable=missing-docstring,unused-argument,invalid-name
 from __future__ import print_function
 
-from ctypes import c_uint
+from ctypes import c_uint, POINTER
 from unittest import TestCase
 
 from mock import call, MagicMock, patch
@@ -211,3 +211,62 @@ class GetNamesUnitTests(PointerWindowTestCase):
         self.pointer_window.get_names()
         mock_fetch.assert_called_once()
         mock_get.assert_called_once()
+
+
+class GetQueryTreeUnitTests(PointerWindowTestCase):
+
+    NUMBER_CHILDREN = 10
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XQueryTree',
+        return_value=MagicMock()
+    )
+    def test_function_call(self, mock_query):
+        self.pointer_window.get_query_tree()
+        mock_query.assert_called_once()
+
+    @patch(
+        'wotw_xlib.common.pointer_window.c_uint',
+        return_value=c_uint(NUMBER_CHILDREN)
+    )
+    @patch(
+        'wotw_xlib.common.pointer_window.XQueryTree',
+        return_value=MagicMock()
+    )
+    def test_return_points(self, mock_query, mock_cuint):
+        pointers, total_count = self.pointer_window.get_query_tree()
+        self.assertEquals(total_count, self.NUMBER_CHILDREN)
+        self.assertIsInstance(pointers, POINTER(Window))
+
+
+class ContainsPointerUnitTests(PointerWindowTestCase):
+
+    CONTAINS = 'yup'
+    PROVIDED_MOUSE_POS = Point(-4, -4)
+    GENERATED_MOUSE_POS = Point(5, 5)
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.get_mouse_position',
+        return_value=['empty', GENERATED_MOUSE_POS]
+    )
+    def test_without_pointer_location(self, mock_get):
+        mock_region = MagicMock()
+        mock_contains = MagicMock(return_value=self.CONTAINS)
+        mock_region.attach_mock(mock_contains, 'contains')
+        self.pointer_window.region = mock_region
+        self.pointer_window.contains_pointer()
+        mock_get.assert_called_once_with()
+        mock_contains.assert_called_once_with(self.GENERATED_MOUSE_POS)
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.get_mouse_position',
+        return_value=['empty', GENERATED_MOUSE_POS]
+    )
+    def test_with_pointer_location(self, mock_get):
+        mock_region = MagicMock()
+        mock_contains = MagicMock(return_value=self.CONTAINS)
+        mock_region.attach_mock(mock_contains, 'contains')
+        self.pointer_window.region = mock_region
+        self.pointer_window.contains_pointer(self.PROVIDED_MOUSE_POS)
+        self.assertEquals(mock_get.call_count, 0)
+        mock_contains.assert_called_once_with(self.PROVIDED_MOUSE_POS)
