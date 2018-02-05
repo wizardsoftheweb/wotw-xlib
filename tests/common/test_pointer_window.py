@@ -4,15 +4,32 @@ from __future__ import print_function
 # from ctypes import c_char_p
 from unittest import TestCase
 
-from mock import MagicMock, patch
+from mock import call, MagicMock, patch
 
 
 from wotw_xlib.common import PointerWindow
-from wotw_xlib.xlib import Window
+# pylint:disable=unused-import
+from wotw_xlib.xlib import (
+    Coordinate,
+    IsViewable,
+    Window,
+    XDefaultScreen,
+    XFetchName,
+    XGetGeometry,
+    XGetWMIconName,
+    XGetWindowAttributes,
+    XQueryPointer,
+    XQueryTree,
+    XRootWindow,
+    XTextProperty,
+    XWindowAttributes
+)
+# pylint:enable=unused-import
 
 
 class PointerWindowTestCase(TestCase):
     DEFAULT_DISPLAY = None
+    DEFAULT_SCREEN = '2'
     PARSED_DISPLAY = 'a display'
     DEFAULT_WINDOW_ID = 47
 
@@ -83,3 +100,25 @@ class ParseWindowIdUnitTests(PointerWindowTestCase):
         result = self.pointer_window.parse_window_id(test_window)
         self.assertNotEquals(result, test_window)
         mock_discover.assert_called_once_with()
+
+
+class DiscoverRootWindowUnitTests(PointerWindowTestCase):
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XDefaultScreen',
+        return_value=PointerWindowTestCase.DEFAULT_SCREEN
+    )
+    @patch(
+        'wotw_xlib.common.pointer_window.XRootWindow',
+        return_value=MagicMock()
+    )
+    def test_root_discovery(self, mock_root, mock_screen):
+        mock_manager = MagicMock()
+        mock_manager.attach_mock(mock_root, 'XRootWindow')
+        mock_manager.attach_mock(mock_screen, 'XDefaultScreen')
+        self.pointer_window.display = self.DEFAULT_DISPLAY
+        self.pointer_window.discover_root_window()
+        mock_manager.assert_has_calls([
+            call.XDefaultScreen(self.DEFAULT_DISPLAY),
+            call.XRootWindow(self.DEFAULT_DISPLAY, self.DEFAULT_SCREEN)
+        ])
