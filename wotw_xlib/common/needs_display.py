@@ -1,7 +1,7 @@
 # pylint: disable=too-many-function-args
 """This file provides NeedsDisplay, a class to collect display tooling"""
 
-from ctypes import c_char_p
+from ctypes import c_char_p, POINTER
 
 
 from wotw_xlib.xlib import Display, XCloseDisplay, XOpenDisplay
@@ -19,7 +19,7 @@ class NeedsDisplay(object):
         """
         This method checks for an existing display and viable display strings
         """
-        if isinstance(unknown_display, Display):
+        if isinstance(unknown_display, (Display, POINTER(Display))):
             return unknown_display
         if not isinstance(unknown_display, (basestring, c_char_p)):
             unknown_display = None
