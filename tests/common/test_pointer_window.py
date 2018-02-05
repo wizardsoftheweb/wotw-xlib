@@ -195,3 +195,19 @@ class GetWindowAttributesUnitTests(PointerWindowTestCase):
     def test_return_points(self, mock_get):
         result = self.pointer_window.get_window_attributes()
         self.assertIsInstance(result, XWindowAttributes)
+
+
+class GetNamesUnitTests(PointerWindowTestCase):
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XGetWMIconName',
+        return_value=MagicMock()
+    )
+    @patch(
+        'wotw_xlib.common.pointer_window.XFetchName',
+        return_value=MagicMock()
+    )
+    def test_function_call(self, mock_fetch, mock_get):
+        self.pointer_window.get_names()
+        mock_fetch.assert_called_once()
+        mock_get.assert_called_once()
