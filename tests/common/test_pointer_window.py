@@ -1,7 +1,7 @@
 # pylint: disable=missing-docstring,unused-argument,invalid-name
 from __future__ import print_function
 
-# from ctypes import c_char_p
+from ctypes import c_uint
 from unittest import TestCase
 
 from mock import call, MagicMock, patch
@@ -146,3 +146,33 @@ class GetMousePositionUnitTests(PointerWindowTestCase):
         self.assertEquals(empty.y, root.y)
         self.assertEquals(empty.x, win.x)
         self.assertEquals(empty.y, win.y)
+
+
+class GetRegionUnitTests(PointerWindowTestCase):
+
+    PADDING = 10
+    TOP_LEFT = Point(0, 0)
+    BOTTOM_RIGHT = Point(PADDING, PADDING)
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XGetGeometry',
+        return_value=MagicMock()
+    )
+    def test_function_call(self, mock_get):
+        self.pointer_window.get_region()
+        mock_get.assert_called_once()
+
+    @patch(
+        'wotw_xlib.common.pointer_window.c_uint',
+        return_value=c_uint(PADDING)
+    )
+    @patch(
+        'wotw_xlib.common.pointer_window.XGetGeometry',
+        return_value=MagicMock()
+    )
+    def test_return_points(self, mock_get, mock_cuint):
+        region = self.pointer_window.get_region()
+        self.assertEquals(region.top_left.x, self.TOP_LEFT.x)
+        self.assertEquals(region.top_left.y, self.TOP_LEFT.y)
+        self.assertEquals(region.bottom_right.x, self.BOTTOM_RIGHT.x)
+        self.assertEquals(region.bottom_right.y, self.BOTTOM_RIGHT.y)
