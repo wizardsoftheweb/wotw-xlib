@@ -128,3 +128,10 @@ class CloseDisplayUnitTests(NeedsDisplayTestCase):
         self.has_display.display = self.PARSED_DISPLAY
         self.has_display.close_display()
         mock_close.assert_called_once_with(self.PARSED_DISPLAY)
+
+
+class EnterUnitTests(NeedsDisplayTestCase):
+
+    def test_self_is_returned(self):
+        result = self.has_display.__enter__()
+        self.assertEquals(self.has_display, result)
