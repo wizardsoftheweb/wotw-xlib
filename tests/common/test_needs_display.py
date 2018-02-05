@@ -146,4 +146,4 @@ class ExitUnitTests(NeedsDisplayTestCase):
     def test_close_is_called(self, mock_close):
         self.has_display.display = self.PARSED_DISPLAY
         self.has_display.__exit__(1, 2, 3)
-        mock_close.assert_called_once_with(self.PARSED_DISPLAY)
+        mock_close.assert_called_once_with()
