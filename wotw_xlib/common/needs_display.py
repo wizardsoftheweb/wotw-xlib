@@ -41,4 +41,4 @@ class NeedsDisplay(object):
 
     def __exit__(self, exception_type, exception_value, traceback):
         """Explicitly closes the display"""
-        self.close_display(self.display)
+        self.close_display()
