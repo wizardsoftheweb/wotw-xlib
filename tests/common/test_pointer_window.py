@@ -11,6 +11,7 @@ from wotw_xlib.common import PointerWindow
 # pylint:disable=unused-import
 from wotw_xlib.xlib import (
     Coordinate,
+    IsUnviewable,
     IsViewable,
     Window,
     XDefaultScreen,
@@ -270,3 +271,50 @@ class ContainsPointerUnitTests(PointerWindowTestCase):
         self.pointer_window.contains_pointer(self.PROVIDED_MOUSE_POS)
         self.assertEquals(mock_get.call_count, 0)
         mock_contains.assert_called_once_with(self.PROVIDED_MOUSE_POS)
+
+
+class IsViewableUnitTests(PointerWindowTestCase):
+    HIDDEN_WINDOW = XWindowAttributes()
+    HIDDEN_WINDOW.map_state = IsUnviewable
+    VISIBLE_WINDOW = XWindowAttributes()
+    VISIBLE_WINDOW.map_state = IsViewable
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.get_window_attributes',
+        return_value=HIDDEN_WINDOW
+    )
+    def test_hidden_without_attributes(self, mock_get):
+        self.pointer_window.window_attributes = None
+        result = self.pointer_window.is_viewable()
+        self.assertFalse(result)
+        mock_get.assert_called_once_with()
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.get_window_attributes',
+        return_value=VISIBLE_WINDOW
+    )
+    def test_visible_without_attributes(self, mock_get):
+        self.pointer_window.window_attributes = None
+        result = self.pointer_window.is_viewable()
+        self.assertTrue(result)
+        mock_get.assert_called_once_with()
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.get_window_attributes',
+        return_value=HIDDEN_WINDOW
+    )
+    def test_hidden_with_attributes(self, mock_get):
+        self.pointer_window.window_attributes = self.HIDDEN_WINDOW
+        result = self.pointer_window.is_viewable()
+        self.assertFalse(result)
+        self.assertEquals(mock_get.call_count, 0)
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.get_window_attributes',
+        return_value=VISIBLE_WINDOW
+    )
+    def test_visible_with_attributes(self, mock_get):
+        self.pointer_window.window_attributes = self.VISIBLE_WINDOW
+        result = self.pointer_window.is_viewable()
+        self.assertTrue(result)
+        self.assertEquals(mock_get.call_count, 0)
