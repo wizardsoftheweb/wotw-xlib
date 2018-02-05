@@ -170,9 +170,28 @@ class GetRegionUnitTests(PointerWindowTestCase):
         'wotw_xlib.common.pointer_window.XGetGeometry',
         return_value=MagicMock()
     )
-    def test_return_points(self, mock_get, mock_cuint):
+    def test_return_region(self, mock_get, mock_cuint):
         region = self.pointer_window.get_region()
         self.assertEquals(region.top_left.x, self.TOP_LEFT.x)
         self.assertEquals(region.top_left.y, self.TOP_LEFT.y)
         self.assertEquals(region.bottom_right.x, self.BOTTOM_RIGHT.x)
         self.assertEquals(region.bottom_right.y, self.BOTTOM_RIGHT.y)
+
+
+class GetWindowAttributesUnitTests(PointerWindowTestCase):
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XGetWindowAttributes',
+        return_value=MagicMock()
+    )
+    def test_function_call(self, mock_get):
+        self.pointer_window.get_window_attributes()
+        mock_get.assert_called_once()
+
+    @patch(
+        'wotw_xlib.common.pointer_window.XGetWindowAttributes',
+        return_value=MagicMock()
+    )
+    def test_return_points(self, mock_get):
+        result = self.pointer_window.get_window_attributes()
+        self.assertIsInstance(result, XWindowAttributes)
