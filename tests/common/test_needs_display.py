@@ -106,3 +106,25 @@ class OpenDisplayUnitTests(NeedsDisplayTestCase):
     def test_parse_is_called(self, mock_open):
         self.has_display.open_display(self.DISPLAY_TO_OPEN)
         mock_open.assert_called_once_with(self.DISPLAY_TO_OPEN)
+
+
+class CloseDisplayUnitTests(NeedsDisplayTestCase):
+
+    @patch(
+        'wotw_xlib.needs_display.XCloseDisplay',
+        return_value=NeedsDisplayTestCase.PARSED_DISPLAY
+    )
+    def test_nothing_happens_without_flag(self, mock_close):
+        self.has_display.opened_display = False
+        self.has_display.close_display()
+        self.assertEquals(mock_close.call_count, 0)
+
+    @patch(
+        'wotw_xlib.needs_display.XCloseDisplay',
+        return_value=NeedsDisplayTestCase.PARSED_DISPLAY
+    )
+    def test_close_is_called_with_flag(self, mock_close):
+        self.has_display.opened_display = True
+        self.has_display.display = self.PARSED_DISPLAY
+        self.has_display.close_display()
+        mock_close.assert_called_once_with(self.PARSED_DISPLAY)
