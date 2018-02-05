@@ -318,3 +318,54 @@ class IsViewableUnitTests(PointerWindowTestCase):
         result = self.pointer_window.is_viewable()
         self.assertTrue(result)
         self.assertEquals(mock_get.call_count, 0)
+
+
+class MightBeUnderThePointerUnitTests(PointerWindowTestCase):
+    POINTER_LOCATION = Point(5, 5)
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.contains_pointer'
+    )
+    @patch(
+        'wotw_xlib.common.PointerWindow.is_viewable'
+    )
+    def test_contains_but_hidden(self, mock_view, mock_contains):
+        mock_contains.return_value = True
+        mock_view.return_value = False
+        result = self.pointer_window.might_be_under_pointer(
+            self.POINTER_LOCATION
+        )
+        mock_contains.assert_called_once_with(self.POINTER_LOCATION)
+        mock_view.assert_called_once_with()
+        self.assertFalse(result)
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.contains_pointer'
+    )
+    @patch(
+        'wotw_xlib.common.PointerWindow.is_viewable'
+    )
+    def test_contains_and_viewable(self, mock_view, mock_contains):
+        mock_contains.return_value = True
+        mock_view.return_value = True
+        result = self.pointer_window.might_be_under_pointer(
+            self.POINTER_LOCATION
+        )
+        mock_contains.assert_called_once_with(self.POINTER_LOCATION)
+        mock_view.assert_called_once_with()
+        self.assertTrue(result)
+
+    @patch(
+        'wotw_xlib.common.PointerWindow.contains_pointer'
+    )
+    @patch(
+        'wotw_xlib.common.PointerWindow.is_viewable'
+    )
+    def test_does_not_contain(self, mock_view, mock_contains):
+        mock_contains.return_value = False
+        result = self.pointer_window.might_be_under_pointer(
+            self.POINTER_LOCATION
+        )
+        mock_contains.assert_called_once_with(self.POINTER_LOCATION)
+        self.assertEquals(mock_view.call_count, 0)
+        self.assertFalse(result)
